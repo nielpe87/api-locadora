@@ -1,13 +1,12 @@
 <?php
 
+use App\Http\Controllers\FilmeController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+
 
 Route::post('/login', function(Request $request){
     $credentials = $request->validate([
@@ -22,11 +21,11 @@ Route::post('/login', function(Request $request){
         $user = User::find( Auth::user()->id );
         $token = $user->createToken('my-token');
 
-        return response()->json(['token' => $token->plainTextToken]);
+        return response()->json(['accessToken' => $token->plainTextToken]);
     }
 
     return response()->json([
-        "message" => "Usuário ou senha inválido"
+        "message" => "Credenciais inválidas"
     ], 401);
 });
 
@@ -35,4 +34,6 @@ Route::post("/logout", function(Request $request){
     $request->user()->currentAccessToken()->delete();
     return response()->json("Token revogado com sucesso!", 200);
 })->middleware('auth:sanctum');
+
+Route::apiResource("/filmes", FilmeController::class)->middleware('auth:sanctum');
 
