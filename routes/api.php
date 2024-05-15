@@ -1,39 +1,21 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\FilmeController;
-use App\Models\User;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/login', [AuthController::class,'auth']);
 
+Route::middleware('auth:sanctum')->group(function(){
 
-Route::post('/login', function(Request $request){
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ],[
-        "email.email" => "email é inválido!"
-    ]);
-
-    if (Auth::attempt($credentials)) {
-
-        $user = User::find( Auth::user()->id );
-        $token = $user->createToken('my-token');
-
-        return response()->json(['accessToken' => $token->plainTextToken]);
-    }
-
-    return response()->json([
-        "message" => "Credenciais inválidas"
-    ], 401);
+    Route::post("/logout", [AuthController::class, 'logout']);
+    Route::apiResource("/filmes", FilmeController::class);
+    Route::apiResource("/categorias", CategoriaController::class);
+    Route::apiResource("users", UserController::class);
+    Route::apiResource("clientes", ClienteController::class);
 });
-
-Route::post("/logout", function(Request $request){
-
-    $request->user()->currentAccessToken()->delete();
-    return response()->json("Token revogado com sucesso!", 200);
-})->middleware('auth:sanctum');
-
-Route::apiResource("/filmes", FilmeController::class)->middleware('auth:sanctum');
 

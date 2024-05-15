@@ -12,7 +12,9 @@ class FilmeController extends Controller
      */
     public function index()
     {
-        return response()->json("Listar todos os filmes");
+        $filmes = Filme::with('categorias')->get();
+
+        return response()->json($filmes);
     }
 
     /**
@@ -20,7 +22,18 @@ class FilmeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $filme = new Filme;
+
+        $filme->titulo = $request->titulo;
+        $filme->classificacao = $request->classificacao;
+
+        $filme->save();
+
+        $filme->categorias()->attach($request->categorias);
+
+        return response()->json($filme, 201);
+
     }
 
     /**
@@ -28,7 +41,8 @@ class FilmeController extends Controller
      */
     public function show(Filme $filme)
     {
-        //
+        $filme = Filme::with("categorias")->find($filme->id);
+        return response()->json($filme);
     }
 
     /**
@@ -36,7 +50,13 @@ class FilmeController extends Controller
      */
     public function update(Request $request, Filme $filme)
     {
-        //
+        $filme->titulo = $request->titulo;
+        $filme->classificacao = $request->classificacao;
+        $filme->update();
+
+        $filme->categorias()->sync($request->categorias);
+
+        return response()->json($filme, 200);
     }
 
     /**
@@ -44,6 +64,8 @@ class FilmeController extends Controller
      */
     public function destroy(Filme $filme)
     {
-        //
+        $filme->delete();
+
+        return response()->json("Excluido com sucesso!");
     }
 }

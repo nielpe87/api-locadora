@@ -11,5 +11,7 @@ class Categoria extends Model
 
     protected $table = "categorias";
 
-
+    public function filmes(){
+        return $this->belongsToMany(Filme::class, "categoria_filme", "categoria_id", "filme_id");
+    }
 }

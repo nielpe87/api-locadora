@@ -12,7 +12,9 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        return response()->json("Listar todos os categorias");
+        $categorias = Categoria::all();
+
+        return response()->json($categorias);
     }
 
     /**
@@ -20,7 +22,11 @@ class CategoriaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $categoria = new Categoria;
+        $categoria->nome = $request->nome;
+        $categoria->save();
+
+        return response()->json($categoria, 201);
     }
 
     /**
